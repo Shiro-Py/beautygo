@@ -30,6 +30,12 @@ export default function HomeScreen() {
       >
         <Text style={styles.buttonText}>🧪 Тест 401</Text>
       </Pressable>
+      <Pressable 
+        style={[styles.button, { marginTop: 32, backgroundColor: '#FFE4E1' }]} 
+        onPress={() => router.push('/debug')}
+      >
+        <Text style={styles.buttonText}>🔧 Debug</Text>
+      </Pressable>
     </ScrollView>
   );
 }
