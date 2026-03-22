@@ -1,27 +1,26 @@
-// api/token-manager.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
-const ACCESS_TOKEN_KEY = '@gobeauty:access';
-const REFRESH_TOKEN_KEY = '@gobeauty:refresh';
+// Ключи строго как в документации бэкенда
+const ACCESS_TOKEN_KEY = 'ACCESS_TOKEN';
+const REFRESH_TOKEN_KEY = 'REFRESH_TOKEN';
 
 export const TokenManager = {
   async saveTokens(access: string, refresh: string): Promise<void> {
-    await AsyncStorage.multiSet([
-      [ACCESS_TOKEN_KEY, access],
-      [REFRESH_TOKEN_KEY, refresh],
-    ]);
+    await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, access);
+    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refresh);
   },
 
   async getAccessToken(): Promise<string | null> {
-    return await AsyncStorage.getItem(ACCESS_TOKEN_KEY);
+    return SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
   },
 
   async getRefreshToken(): Promise<string | null> {
-    return await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+    return SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
   },
 
   async clearTokens(): Promise<void> {
-    await AsyncStorage.multiRemove([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY]);
+    await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+    await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
   },
 
   async hasTokens(): Promise<boolean> {

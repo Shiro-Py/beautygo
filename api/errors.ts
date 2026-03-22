@@ -1,12 +1,13 @@
 // api/errors.ts
-export type ApiErrorCode = 
-  | 'UNAUTHORIZED' 
-  | 'FORBIDDEN' 
-  | 'NOT_FOUND' 
-  | 'SERVER_ERROR' 
-  | 'TIMEOUT' 
+export type ApiErrorCode =
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'SERVER_ERROR'
+  | 'TIMEOUT'
   | 'NETWORK_ERROR'
   | 'VALIDATION_ERROR'
+  | 'RATE_LIMITED'
   | 'UNKNOWN';
 
 export class ApiError extends Error {
@@ -41,6 +42,8 @@ export class ApiError extends Error {
       case 400:
       case 422:
         return new ApiError('VALIDATION_ERROR', data?.detail || data?.message || 'Ошибка валидации данных.', status, error);
+      case 429:
+        return new ApiError('RATE_LIMITED', data?.detail || 'Слишком много попыток. Подождите и попробуйте снова.', status, error);
       case 500:
       case 502:
       case 503:

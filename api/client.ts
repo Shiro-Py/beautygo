@@ -1,12 +1,13 @@
 // api/client.ts
-import axios, { 
-  AxiosInstance, 
-  AxiosRequestConfig, 
-  AxiosResponse, 
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
   AxiosError,
-  InternalAxiosRequestConfig 
+  InternalAxiosRequestConfig
 } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import * as Application from 'expo-application';
 import { router } from 'expo-router';
 
 import { API_CONFIG, API_ENDPOINTS } from './constants';
@@ -53,6 +54,19 @@ export class ApiClient {
         const token = await TokenManager.getAccessToken();
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        if (config.headers) {
+          config.headers['X-App-Type'] = 'client';
+          // X-Device-Id: генерируем один раз, храним в SecureStore
+          let deviceId = await SecureStore.getItemAsync('DEVICE_ID');
+          if (!deviceId) {
+            deviceId = Application.androidId
+              ?? Application.getIosIdForVendorAsync
+              ?? `device_${Date.now()}`;
+            await SecureStore.setItemAsync('DEVICE_ID', String(deviceId));
+          }
+          config.headers['X-Device-Id'] = deviceId;
         }
 
         (config as any).requestStartTime = startTime;
@@ -103,9 +117,10 @@ export class ApiClient {
   console.log('  URL:', config.url);
   
   // Проверяем, не является ли это запросом на refresh или login
-  const isAuthRequest = 
-    config.url?.includes('/auth/login/') || 
-    config.url?.includes('/auth/refresh/');
+  const isAuthRequest =
+    config.url?.includes('/auth/send-otp/') ||
+    config.url?.includes('/auth/verify-otp/') ||
+    config.url?.includes('/auth/token/refresh/');
   
   console.log('  isAuthRequest:', isAuthRequest);
   
@@ -124,7 +139,7 @@ export class ApiClient {
       console.log('❌ Refresh не удался:', refreshError);
       // Refresh не удался → logout
       await TokenManager.clearTokens();
-      router.replace('/auth/login');
+      router.replace('/(auth)/login');
     }
   } else {
     console.log('⚠️ Это auth запрос, не делаем refresh');

@@ -7,20 +7,18 @@ type Props = {
   rating: number;
   onPress: () => void;
   avatarPlaceholder?: string;
+  avatarUri?: string;
 };
 
-export default function MasterPreviewCard({ name, service, rating, onPress, avatarPlaceholder }: Props) {
+export default function MasterPreviewCard({ name, service, rating, onPress, avatarPlaceholder, avatarUri }: Props) {
   return (
     <Pressable style={styles.card} onPress={onPress}>
-      {avatarPlaceholder ? (
-        <View style={styles.avatarPlaceholder}>
-          <Text style={styles.avatarText}>{avatarPlaceholder}</Text>
-        </View>
+      {avatarUri ? (
+        <Image source={{ uri: avatarUri }} style={styles.avatar} />
       ) : (
-        <Image
-          source={{ uri: 'https://via.placeholder.com/60x60.png?text=👩‍🎨' }}
-          style={styles.avatar}
-        />
+        <View style={styles.avatarPlaceholder}>
+          <Text style={styles.avatarText}>{avatarPlaceholder ?? '?'}</Text>
+        </View>
       )}
       <View style={styles.info}>
         <Text style={styles.name}>{name}</Text>

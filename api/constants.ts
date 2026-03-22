@@ -11,41 +11,58 @@ export const API_CONFIG = {
 export const API_ENDPOINTS = {
   // 🔐 Авторизация
   auth: {
-    login: '/auth/login/',
+    sendOtp: '/auth/send-otp/',
+    verifyOtp: '/auth/verify-otp/',
     register: '/auth/register/',
-    refresh: '/auth/refresh/',
-    profileMe: '/auth/profile/me/',
-    services: '/auth/services/',
-    serviceById: (id: string | number) => `/auth/services/${id}/`,
+    refresh: '/auth/token/refresh/',
+    logout: '/auth/logout/',
+    profileMe: '/clients/me',
   },
   
-  // 👥 Мастера (добавь когда будут эндпоинты)
-  masters: {
-    list: '/masters/',
-    byId: (id: string | number) => `/masters/${id}/`,
-    search: '/masters/search/',
+  // 👥 Специалисты
+  specialists: {
+    list: '/specialists/',
+    byId: (id: string | number) => `/specialists/${id}/`,
+    services: (id: string | number) => `/specialists/${id}/services/`,
+    slots: (id: string | number) => `/specialists/${id}/slots/`,
+    reviews: (id: string | number) => `/specialists/${id}/reviews/`,
+    favorite: (id: string | number) => `/specialists/${id}/favorite/`,
   },
-  
-  // 📅 Бронирования (добавь когда будут эндпоинты)
-  booking: {
-    create: '/booking/',
-    list: '/booking/list/',
-    byId: (id: string | number) => `/booking/${id}/`,
-    cancel: (id: string | number) => `/booking/${id}/cancel/`,
+
+  // 🛎️ Услуги
+  services: {
+    categories: '/services/categories/',
+    list: '/services/',
+    byId: (id: string | number) => `/services/${id}/`,
+  },
+
+  // 📅 Бронирования
+  appointments: {
+    create: '/appointments/',
+    list: '/appointments/',
+    byId: (id: string | number) => `/appointments/${id}/`,
+    cancel: (id: string | number) => `/appointments/${id}/cancel/`,
+    reschedule: (id: string | number) => `/appointments/${id}/reschedule/`,
+  },
+
+  // 🤖 AI
+  ai: {
+    chat: '/ai/chat/',
+    conversations: '/ai/conversations/',
+    conversation: (id: string | number) => `/ai/conversations/${id}/`,
   },
 } as const;
 
-export interface LoginCredentials {
-  username: string;
-  password: string;
+// OTP flow types
+export interface VerifyOtpResponse {
+  access: string;
+  refresh: string;
+  has_profile: boolean;   // false → онбординг, true → Main Screen
 }
 
-// Данные для регистрации
-export interface RegisterCredentials extends LoginCredentials {
-  email: string;
-  phone: string;
-  role: 'client' | 'specialist';
-  full_name?: string;  // Опциональное поле
+export interface CompleteRegistrationData {
+  first_name: string;
+  last_name?: string;
 }
 
 // Ответ от сервера при логине/регистации
@@ -73,6 +90,44 @@ export interface Service {
   duration_minutes: number;
   created_at: string;  // ISO дата
   specialist: number;  // ID специалиста
+}
+
+// Специалист (мастер)
+export interface Specialist {
+  id: number;
+  full_name: string;
+  avatar: string | null;
+  bio: string;
+  city: string;
+  experience_years: number;
+  rating: string;        // Decimal как строка, напр. "4.80"
+  reviews_count: number;
+  services: Service[];   // Может быть пустым массивом
+}
+
+// Пагинированный ответ
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+// Слот записи
+export interface TimeSlot {
+  id: number;
+  date: string;          // "2025-04-20"
+  time: string;          // "14:00"
+  is_available: boolean;
+}
+
+// Отзыв
+export interface Review {
+  id: number;
+  author_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
 }
 
 /**

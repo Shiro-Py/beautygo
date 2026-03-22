@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(npm show:*)",
+      "Bash(node -e \"const v=require\\(''''fs''''\\).readFileSync\\(''''/dev/stdin'''',''''utf8''''\\); const arr=JSON.parse\\(v\\); console.log\\(arr.filter\\(x=>x.startsWith\\(''''54.''''\\)\\).join\\(''''\\\\n''''\\)\\)\")",
+      "Bash(npm install:*)",
+      "Bash(npx expo:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(ls \"c:/Users/SIM/Documents/beautygo-mobile/apps/client/app/\\(auth\\)/\")",
+      "Bash(mkdir -p \"c:/Users/SIM/Documents/beautygo-mobile/apps/client/assets\")",
+      "Bash(mkdir -p \"c:/Users/SIM/Documents/beautygo-mobile/apps/pro/assets\")",
+      "Bash(cp \"c:/Users/SIM/Documents/beautygo_front-dev/assets/images/icon.png\" \"c:/Users/SIM/Documents/beautygo-mobile/apps/client/assets/icon.png\")",
+      "Bash(cp \"c:/Users/SIM/Documents/beautygo_front-dev/assets/images/splash-icon.png\" \"c:/Users/SIM/Documents/beautygo-mobile/apps/client/assets/splash.png\")",
+      "Bash(cp \"c:/Users/SIM/Documents/beautygo_front-dev/assets/images/adaptive-icon.png\" \"c:/Users/SIM/Documents/beautygo-mobile/apps/client/assets/adaptive-icon.png\")",
+      "Bash(cp \"c:/Users/SIM/Documents/beautygo_front-dev/assets/images/icon.png\" \"c:/Users/SIM/Documents/beautygo-mobile/apps/pro/assets/icon.png\")",
+      "Bash(cp \"c:/Users/SIM/Documents/beautygo_front-dev/assets/images/splash-icon.png\" \"c:/Users/SIM/Documents/beautygo-mobile/apps/pro/assets/splash.png\")",
+      "Bash(cp \"c:/Users/SIM/Documents/beautygo_front-dev/assets/images/adaptive-icon.png\" \"c:/Users/SIM/Documents/beautygo-mobile/apps/pro/assets/adaptive-icon.png\")",
+      "Read(//c/Users/SIM/Documents/beautygo-mobile/apps/client/node_modules/**)",
+      "Read(//c/Users/SIM/Documents/beautygo-mobile/node_modules/**)",
+      "Bash(mkdir -p \"c:/Users/SIM/Documents/beautygo-mobile/apps/client/assets/fonts\")",
+      "Bash(cp \"c:/Users/SIM/Documents/beautygo_front-dev/assets/fonts/SpaceMono-Regular.ttf\" \"c:/Users/SIM/Documents/beautygo-mobile/apps/client/assets/fonts/SpaceMono-Regular.ttf\")"
+    ]
+  }
+}

@@ -16,19 +16,12 @@ export default function HomeScreen() {
         <Text style={styles.buttonText}>Найти мастера</Text>
       </Pressable>
 
-      <Pressable style={styles.secondaryButton} onPress={() => router.push('/auth/login')}>
+      <Pressable style={styles.secondaryButton} onPress={() => router.push('/(auth)/login')}>
         <Text style={styles.secondaryText}>Войти</Text>
       </Pressable>
 
-      <Pressable style={styles.secondaryButton} onPress={() => router.push('/auth/register')}>
+      <Pressable style={styles.secondaryButton} onPress={() => router.push('/(auth)/register')}>
         <Text style={styles.secondaryText}>Регистрация</Text>
-      </Pressable>
-       {/* 🧪 НОВАЯ КНОПКА ДЛЯ ТЕСТА (добавь в конец) */}
-      <Pressable 
-        style={styles.button} 
-        onPress={() => router.push('/test-401')}
-      >
-        <Text style={styles.buttonText}>🧪 Тест 401</Text>
       </Pressable>
       <Pressable 
         style={[styles.button, { marginTop: 32, backgroundColor: '#FFE4E1' }]} 

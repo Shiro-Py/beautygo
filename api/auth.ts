@@ -1,36 +1,34 @@
 // api/auth.ts
 import { apiClient } from './client';
-import { API_ENDPOINTS, LoginCredentials, RegisterCredentials, AuthTokens, UserProfile } from './constants';
+import { API_ENDPOINTS, VerifyOtpResponse, CompleteRegistrationData, UserProfile } from './constants';
 import { TokenManager } from './token-manager';
 import { router } from 'expo-router';
 
 export const AuthService = {
   /**
-   * Логин: получаем access/refresh токены
+   * Шаг 1: Отправить OTP на телефон
    */
-  async login(credentials: LoginCredentials): Promise<AuthTokens> {
-    console.log('📤 Login запрос:', credentials);
-    const tokens = await apiClient.post<AuthTokens>(
-      API_ENDPOINTS.auth.login,
-      credentials
-    );
-    console.log('📥 Получены токены:', {
-      access: tokens.access ? tokens.access.substring(0, 20) + '...' : 'нет',
-      refresh: tokens.refresh ? tokens.refresh.substring(0, 20) + '...' : 'нет',
-    });
-    await TokenManager.saveTokens(tokens.access, tokens.refresh);
-    console.log('✅ Токены сохранены в AsyncStorage');
-    return tokens;
+  async sendOtp(phone: string): Promise<{ retry_after: number }> {
+    const response = await apiClient.post<any>(API_ENDPOINTS.auth.sendOtp, { phone });
+    // Поддержка обёрнутого { data: {...} } и прямого ответа
+    return response?.data ?? response ?? { retry_after: 60 };
   },
 
   /**
-   * Регистрация
-   * ⚠️ Схема в docs пустая — передаём данные как есть, бэкенд разберёт
+   * Шаг 2: Проверить OTP-код → получить JWT + флаг is_new_user
    */
-  async register(data: RegisterCredentials): Promise<void> {
+  async verifyOtp(phone: string, code: string): Promise<VerifyOtpResponse> {
+    const response = await apiClient.post<any>(API_ENDPOINTS.auth.verifyOtp, { phone, code });
+    const result: VerifyOtpResponse = response?.data ?? response;
+    await TokenManager.saveTokens(result.access, result.refresh);
+    return result;
+  },
+
+  /**
+   * Шаг 3 (только для новых пользователей): Завершить регистрацию
+   */
+  async completeRegistration(data: CompleteRegistrationData): Promise<void> {
     await apiClient.post(API_ENDPOINTS.auth.register, data);
-    // После успешной регистрации можно сразу залогинить пользователя
-    // или попросить войти вручную — зависит от твоей логики
   },
 
   /**
@@ -41,29 +39,35 @@ export const AuthService = {
   },
 
   /**
-   * Обновить профиль (частично или полностью)
+   * Обновить профиль (частично)
    */
-  async updateProfile(data: Partial<UserProfile>, patch = true): Promise<UserProfile> {
-    if (patch) {
-      return await apiClient.patch<UserProfile>(API_ENDPOINTS.auth.profileMe, data);
-    }
-    return await apiClient.put<UserProfile>(API_ENDPOINTS.auth.profileMe, data);
+  async updateProfile(data: Partial<UserProfile>): Promise<UserProfile> {
+    return await apiClient.patch<UserProfile>(API_ENDPOINTS.auth.profileMe, data);
   },
 
   /**
-   * Логаут: очищаем токены + редирект
+   * Логаут: инвалидируем refresh token на сервере + чистим локально
    */
   async logout(): Promise<void> {
-    // Опционально: уведомить сервер (не блокируем юзера, если ошибка)
-    await apiClient.post(API_ENDPOINTS.auth.refresh, {}, { timeout: 2000 })
-      .catch(() => { /* игнорируем */ });
-    
-    await TokenManager.clearTokens();
-    router.replace('/auth/login');
+    try {
+      const refreshToken = await TokenManager.getRefreshToken();
+      if (refreshToken) {
+        await apiClient.post(
+          API_ENDPOINTS.auth.logout,
+          { refresh: refreshToken },
+          { timeout: 2000 }
+        );
+      }
+    } catch {
+      // Игнорируем ошибки сервера при logout
+    } finally {
+      await TokenManager.clearTokens();
+      router.replace('/(auth)/login');
+    }
   },
 
   /**
-   * Проверка: авторизован ли пользователь
+   * Проверка: есть ли токены локально
    */
   async isAuthenticated(): Promise<boolean> {
     return await TokenManager.hasTokens();

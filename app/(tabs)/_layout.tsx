@@ -1,3 +1,4 @@
+// app/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,6 +15,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'AI Чат',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="sparkles" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="search"
         options={{
           title: 'Карта',
@@ -23,11 +33,25 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile/[id]"
+        name="profile"
         options={{
-          href: null, // скрыт из табов
+          title: 'Профиль',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
+          ),
         }}
       />
+      <Tabs.Screen
+        name="debug"
+        options={{
+          title: '🔧 Debug',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="bug" size={size} color={color} />
+          ),
+        }}
+      />
+      {/* Скрытые экраны — доступны через навигацию, но без таб-кнопки */}
+      <Tabs.Screen name="booking" options={{ href: null }} />
     </Tabs>
   );
 }
